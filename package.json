@@ -1,0 +1,13 @@
+{
+  "name": "ceoxb-warm-welcome-prototype",
+  "version": "1.0.0",
+  "description": "CEO XB Warm Welcome Prototype with Vercel Analytics",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build step required for static HTML'"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  }
+}
