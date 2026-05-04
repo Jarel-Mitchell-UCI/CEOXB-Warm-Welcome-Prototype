@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEO XB — The Streak</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #CBD5E0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .app {
+    width: 100%;
+    max-width: 390px;
+    min-height: 100vh;
+    background: #F7F9FB;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOP BAR */
+  .top-bar {
+    background: #0A3761;
+    padding: 48px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .top-bar-title { color:#fff; font-size:18px; font-weight:800; }
+  .top-bar-avatar {
+    width:34px; height:34px; border-radius:50%;
+    background:#106E9E; display:flex; align-items:center;
+    justify-content:center; color:#fff; font-size:13px; font-weight:700;
+  }
+  .top-bar-back {
+    display:flex; align-items:center; gap:6px;
+    color:#fff; font-size:14px; font-weight:500;
+    cursor:pointer; background:none; border:none; padding:0;
+    font-family:'Plus Jakarta Sans',sans-serif;
+  }
+
+  /* SCROLL AREA */
+  .scroll-area { flex:1; overflow-y:auto; padding-bottom:90px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position:fixed; bottom:0; width:100%; max-width:390px;
+    background:#fff; border-top:1px solid #E2E8F0;
+    display:flex; justify-content:space-around;
+    padding:10px 0 20px; z-index:10;
+  }
+  .nav-tab {
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    font-size:10px; font-weight:500; color:#5D666F;
+    min-width:44px; min-height:44px; justify-content:center;
+  }
+  .nav-tab.active { color:#106E9E; }
+  .nav-dot {
+    width:22px; height:22px; border-radius:4px; background:#CBD5E0;
+  }
+  .nav-tab.active .nav-dot { background:#106E9E; }
+  .nav-underline { height:2px; width:20px; background:#106E9E; border-radius:99px; }
+
+  /* WELCOME CARD */
+  .welcome-card {
+    margin:16px 20px 0;
+    background:#0C4C6F; border-radius:16px;
+    padding:20px; color:#fff; position:relative; overflow:hidden;
+  }
+  .welcome-card::before {
+    content:''; position:absolute; top:-30px; right:-30px;
+    width:120px; height:120px; border-radius:50%;
+    background:rgba(255,255,255,0.06);
+  }
+  .welcome-eyebrow {
+    font-size:11px; font-weight:600; letter-spacing:0.1em;
+    text-transform:uppercase; color:rgba(255,255,255,0.65); margin-bottom:8px;
+  }
+  .welcome-heading { font-size:21px; font-weight:800; line-height:1.25; margin-bottom:10px; }
+  .welcome-body {
+    font-size:14px; line-height:1.55; color:rgba(255,255,255,0.82); margin-bottom:16px;
+  }
+  .member-row {
+    display:flex; align-items:center; gap:10px;
+    background:rgba(255,255,255,0.1); border-radius:10px;
+    padding:10px 12px; margin-bottom:16px;
+  }
+  .member-avatar {
+    width:40px; height:40px; border-radius:50%; background:#106E9E;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; font-weight:700; color:#fff; flex-shrink:0;
+    border:2px solid rgba(255,255,255,0.25);
+  }
+  .member-name { font-size:14px; font-weight:700; }
+  .member-role { font-size:12px; color:rgba(255,255,255,0.65); margin-top:2px; }
+  .pill-tag {
+    background:#106E9E; border-radius:99px; padding:3px 10px;
+    font-size:11px; font-weight:600; color:#fff; white-space:nowrap;
+  }
+  .btn-white {
+    width:100%; background:#fff; color:#0C4C6F; border:none;
+    border-radius:9999px; padding:14px 20px;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:16px; font-weight:700; cursor:pointer; min-height:48px;
+  }
+  .btn-navy {
+    width:100%; background:#0C4C6F; color:#fff; border:none;
+    border-radius:9999px; padding:14px 20px;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:16px; font-weight:700; cursor:pointer; min-height:48px;
+    transition:background 0.15s;
+  }
+  .btn-navy:active { background:#062C50; }
+  .btn-navy.disabled { opacity:0.42; cursor:not-allowed; }
+
+  /* STREAK + STATS */
+  .streak-card {
+    margin:12px 20px 0; background:#fff; border-radius:16px;
+    padding:16px 20px; border:1px solid #E2E8F0;
+    display:flex; align-items:center; gap:14px;
+  }
+  .streak-ring {
+    width:52px; height:52px; border-radius:50%;
+    border:3px solid #0C4C6F; display:flex;
+    align-items:center; justify-content:center;
+    font-size:22px; flex-shrink:0;
+  }
+  .streak-label { font-size:15px; font-weight:700; }
+  .streak-sub { font-size:12px; color:#5D666F; margin-top:3px; line-height:1.4; }
+  .stats-row { margin:12px 20px 0; display:flex; gap:10px; }
+  .stat-card {
+    flex:1; background:#fff; border-radius:12px;
+    padding:14px 16px; border:1px solid #E2E8F0;
+  }
+  .stat-value { font-size:22px; font-weight:800; color:#0C4C6F; }
+  .stat-label { font-size:11px; color:#5D666F; margin-top:2px; font-weight:500; }
+
+  /* MODULE CARDS */
+  .section-header {
+    padding:20px 20px 8px; font-size:11px; font-weight:600;
+    letter-spacing:0.08em; text-transform:uppercase; color:#5D666F;
+  }
+  .module-card {
+    margin:8px 20px 0; background:#fff; border-radius:16px;
+    padding:16px 20px; border:1px solid #E2E8F0;
+    display:flex; align-items:center; gap:14px;
+  }
+  .ring-wrap { width:52px; height:52px; position:relative; flex-shrink:0; }
+  .ring-wrap svg { transform:rotate(-90deg); }
+  .ring-center {
+    position:absolute; inset:0; display:flex; align-items:center;
+    justify-content:center; font-size:11px; font-weight:700; color:#0C4C6F;
+  }
+  .module-title { font-size:14px; font-weight:700; }
+  .module-meta { font-size:12px; color:#5D666F; margin-top:3px; }
+
+  /* SCHEDULE SCREEN */
+  .sched-body { padding:20px; }
+  .member-card-2 {
+    background:#fff; border-radius:16px; padding:18px;
+    border:1px solid #E2E8F0; display:flex; align-items:center;
+    gap:14px; margin-bottom:20px;
+  }
+  .member-avatar-2 {
+    width:52px; height:52px; border-radius:50%; background:#0C4C6F;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:700; color:#fff; flex-shrink:0;
+  }
+  .form-label {
+    font-size:11px; font-weight:600; letter-spacing:0.07em;
+    text-transform:uppercase; color:#5D666F; margin-bottom:10px;
+  }
+  .day-grid { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  .chip {
+    padding:8px 16px; border-radius:99px; border:1.5px solid #CBD5E0;
+    font-size:13px; font-weight:600; color:#5D666F; cursor:pointer;
+    background:#fff; min-height:44px; display:flex; align-items:center;
+    transition:all 0.12s; font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .chip.sel { background:#0C4C6F; border-color:#0C4C6F; color:#fff; }
+  .time-grid { display:flex; gap:8px; margin-bottom:20px; }
+  .time-chip {
+    flex:1; padding:10px 8px; border-radius:10px; border:1.5px solid #CBD5E0;
+    font-size:13px; font-weight:600; color:#5D666F; cursor:pointer;
+    background:#fff; text-align:center; min-height:44px;
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.12s; font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .time-chip.sel { background:#0C4C6F; border-color:#0C4C6F; color:#fff; }
+  .tz-note {
+    font-size:12px; color:#5D666F; margin-bottom:20px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .notif-banner {
+    background:#EDF2F7; border-radius:12px; padding:14px 16px;
+    display:flex; align-items:flex-start; gap:10px;
+    font-size:13px; line-height:1.5; color:#0A3761;
+    font-weight:500; margin-bottom:24px;
+  }
+
+  /* SUCCESS */
+  .success-hero {
+    background:#062C50; padding:36px 20px 28px;
+    text-align:center; color:#fff;
+  }
+  .success-icon { font-size:52px; display:block; margin-bottom:12px; }
+  .success-heading { font-size:24px; font-weight:800; margin-bottom:8px; }
+  .success-sub {
+    font-size:14px; color:rgba(255,255,255,0.72);
+    line-height:1.55; max-width:280px; margin:0 auto;
+  }
+  .earned-badge {
+    display:flex; align-items:center; gap:12px;
+    background:rgba(255,255,255,0.12); border-radius:10px;
+    padding:12px 16px; margin-top:16px; justify-content:center;
+  }
+  .earned-cups { font-size:22px; font-weight:800; }
+  .earned-label { font-size:13px; font-weight:600; text-align:left; }
+  .earned-sub { font-size:11px; color:rgba(255,255,255,0.5); margin-top:2px; }
+
+  /* LEADERBOARD */
+  .lb-section { padding:20px; }
+  .lb-title { font-size:16px; font-weight:800; margin-bottom:4px; }
+  .lb-sub { font-size:12px; color:#5D666F; margin-bottom:16px; }
+  .lb-row {
+    display:flex; align-items:center; gap:12px;
+    padding:11px 14px; border-radius:12px; margin-bottom:8px;
+    background:#fff; border:1px solid #E2E8F0;
+  }
+  .lb-row.you { background:#062C50; border-color:#062C50; color:#fff; }
+  .lb-rank { font-size:13px; font-weight:800; width:18px; text-align:center; color:#5D666F; flex-shrink:0; }
+  .lb-row.you .lb-rank { color:rgba(255,255,255,0.5); }
+  .lb-av {
+    width:34px; height:34px; border-radius:50%; background:#EDF2F7;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:#0C4C6F; flex-shrink:0;
+  }
+  .lb-row.you .lb-av { background:#106E9E; color:#fff; }
+  .lb-name-wrap { flex:1; }
+  .lb-name { font-size:13px; font-weight:600; color:#000; }
+  .lb-row.you .lb-name { color:#fff; }
+  .lb-you-tag { font-size:10px; color:rgba(255,255,255,0.55); display:block; margin-top:1px; }
+  .lb-cups { display:flex; align-items:center; gap:4px; font-size:13px; font-weight:700; color:#0C4C6F; }
+  .lb-row.you .lb-cups { color:#fff; }
+  .freeze-banner {
+    background:#EDF2F7; border-radius:10px; padding:12px 14px;
+    display:flex; align-items:flex-start; gap:10px;
+    font-size:12px; color:#0A3761; font-weight:500;
+    line-height:1.4; margin-top:16px;
+  }
+
+  /* ANIM */
+  .screen { animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+const DAYS = ['Mon','Tue','Wed','Thu','Fri'];
+const TIMES = ['Morning','Afternoon','Evening'];
+const LB = [
+  {rank:1,ini:'RN',name:'Dr. Rashida Nwosu',cups:7},
+  {rank:2,ini:'KL',name:'Kevin Liang',cups:6},
+  {rank:3,ini:'MB',name:'Dr. Marcus Brandt',cups:5},
+  {rank:4,ini:'SO',name:'Dr. Sarah Okonkwo',cups:4,you:true},
+  {rank:5,ini:'PV',name:'Priya Vasquez',cups:3},
+  {rank:6,ini:'TF',name:'Thomas Ferreira',cups:3},
+  {rank:7,ini:'AK',name:'Dr. Anika Kapoor',cups:2},
+  {rank:8,ini:'JO',name:'James Osei',cups:1},
+];
+
+let screen = 'home';
+let selDays = [];
+let selTime = null;
+
+function render() {
+  const app = document.getElementById('app');
+  if (screen === 'home') app.innerHTML = homeHTML();
+  else if (screen === 'schedule') app.innerHTML = schedHTML();
+  else app.innerHTML = successHTML();
+  attachEvents();
+}
+
+function navHTML() {
+  const tabs = ['Home','Learn','Connect','Discuss','Profile'];
+  return `<div class="bottom-nav">${tabs.map((t,i) => `
+    <div class="nav-tab ${i===0?'active':''}">
+      <div class="nav-dot"></div>
+      <span>${t}</span>
+      ${i===0?'<div class="nav-underline"></div>':''}
+    </div>`).join('')}</div>`;
+}
+
+function ringHTML(pct) {
+  const r=22,circ=2*Math.PI*r,dash=(pct/100)*circ;
+  return `<div class="ring-wrap">
+    <svg width="52" height="52" viewBox="0 0 52 52">
+      <circle cx="26" cy="26" r="${r}" fill="none" stroke="#EDF2F7" stroke-width="3"/>
+      <circle cx="26" cy="26" r="${r}" fill="none" stroke="#0C4C6F" stroke-width="3"
+        stroke-dasharray="${dash} ${circ}" stroke-linecap="round"/>
+    </svg>
+    <div class="ring-center">${pct}%</div>
+  </div>`;
+}
+
+function homeHTML() {
+  return `<div class="screen">
+  <div class="top-bar">
+    <div style="color:#fff;font-size:15px;font-weight:600;opacity:0.85">Welcome 👋</div>
+    <div class="top-bar-avatar">SO</div>
+  </div>
+  <div class="scroll-area">
+    <div style="padding:16px 20px 0">
+      <div class="welcome-card" style="background:#062C50">
+        <div class="welcome-eyebrow">☕ Your first coffee chat</div>
+        <div class="welcome-heading">Welcome to cohort 14, Dr. Okonkwo.</div>
+        <div class="welcome-body">Kevin Liang is a fellow cohort member and wants to connect. Schedule a 30-minute coffee to get acquainted — and earn your first point on the leaderboard.</div>
+        <div class="member-row">
+          <div class="member-avatar">KL</div>
+          <div style="flex:1">
+            <div class="member-name">Kevin Liang</div>
+            <div class="member-role">CEO, Helix Diagnostics · Boston</div>
+          </div>
+          <span class="pill-tag">Cohort 14</span>
+        </div>
+        <button class="btn-white" id="btnSchedule">Schedule Coffee Chat</button>
+        <button id="btnSkip" style="width:100%;background:none;border:none;color:rgba(255,255,255,0.55);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;padding:10px 0 2px;text-decoration:underline;text-underline-offset:3px;">Skip for now</button>
+      </div>
+    </div>
+
+    <div class="streak-card">
+      <div class="streak-ring">☕</div>
+      <div>
+        <div class="streak-label">The Coffee Streak</div>
+        <div class="streak-sub">Chat with every cohort member to build your streak and hold your rank.</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Coffees earned</div></div>
+      <div class="stat-card"><div class="stat-value">#8</div><div class="stat-label">Cohort rank</div></div>
+      <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">Members left</div></div>
+    </div>
+
+    <div class="section-header">Continue Learning</div>
+    <div class="module-card">
+      ${ringHTML(40)}
+      <div><div class="module-title">Scaling Healthcare Operations</div><div class="module-meta">Module 2 of 5 · 3 sessions left</div></div>
+    </div>
+    <div class="module-card">
+      ${ringHTML(0)}
+      <div><div class="module-title">Board Governance Essentials</div><div class="module-meta">Module 1 of 4 · Starts this week</div></div>
+    </div>
+  </div>
+  ${navHTML()}
+  </div>`;
+}
+
+function schedHTML() {
+  const canSubmit = selDays.length > 0 && selTime;
+  return `<div class="screen">
+  <div class="top-bar">
+    <button class="top-bar-back" id="btnBack">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Back
+    </button>
+    <div class="top-bar-title">Coffee Chat</div>
+    <div style="width:44px"></div>
+  </div>
+  <div class="scroll-area">
+    <div class="sched-body">
+      <p style="font-size:14px;color:#5D666F;margin-bottom:20px;line-height:1.55">Share your weekly availability and we'll find a time that works for both of you.</p>
+
+      <div class="member-card-2">
+        <div class="member-avatar-2">KL</div>
+        <div>
+          <div style="font-size:15px;font-weight:700">Kevin Liang</div>
+          <div style="font-size:12px;color:#5D666F;margin-top:3px">CEO, Helix Diagnostics</div>
+          <div style="margin-top:6px;background:#EDF2F7;display:inline-block;border-radius:99px;padding:3px 10px;font-size:11px;font-weight:600;color:#0C4C6F">Cohort 14 · Boston, MA</div>
+        </div>
+      </div>
+
+      <div class="form-label">Which days work for you?</div>
+      <div class="day-grid">
+        ${DAYS.map(d => `<button class="chip day-chip ${selDays.includes(d)?'sel':''}" data-day="${d}">${d}</button>`).join('')}
+      </div>
+
+      <div class="form-label">Preferred time of day</div>
+      <div class="time-grid">
+        ${TIMES.map(t => `<button class="time-chip ${selTime===t?'sel':''}" data-time="${t}">${t}</button>`).join('')}
+      </div>
+
+      <div class="tz-note">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#106E9E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Times shown in your local timezone (ET)
+      </div>
+
+      <div class="notif-banner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#106E9E" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Once Kevin confirms your overlapping availability, you'll receive a notification with your scheduled time and a calendar invite.
+      </div>
+
+      <button class="btn-navy ${canSubmit?'':'disabled'}" id="btnConfirm">Submit Availability</button>
+      <p style="font-size:12px;color:#5D666F;text-align:center;margin-top:12px;line-height:1.4">Select at least one day and a time preference to continue.</p>
+    </div>
+  </div>
+  ${navHTML()}
+  </div>`;
+}
+
+function successHTML() {
+  return `<div class="screen">
+  <div class="success-hero">
+    <span class="success-icon">☕</span>
+    <div class="success-heading">Coffee earned.</div>
+    <div class="success-sub">Your chat with Kevin Liang is confirmed. You've moved up in your cohort leaderboard.</div>
+    <div class="earned-badge">
+      <span class="earned-cups">☕ ×1</span>
+      <div>
+        <div class="earned-label">First coffee earned</div>
+        <div class="earned-sub">Cohort 14 · Week 1</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lb-section">
+    <div class="lb-title">Cohort 14 Leaderboard</div>
+    <div class="lb-sub">Coffees earned · Week 1 of 8</div>
+    ${LB.map(m => `
+    <div class="lb-row ${m.you?'you':''}">
+      <div class="lb-rank">${m.rank}</div>
+      <div class="lb-av">${m.ini}</div>
+      <div class="lb-name-wrap">
+        <div class="lb-name">${m.name}</div>
+        ${m.you?'<span class="lb-you-tag">You · moved up to #4</span>':''}
+      </div>
+      <div class="lb-cups">☕ ${m.cups}</div>
+    </div>`).join('')}
+
+    <div class="freeze-banner">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#106E9E" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>
+      Chat with all 8 cohort members to freeze your rank for 7 days.
+    </div>
+
+    <button class="btn-navy" id="btnHome" style="margin-top:20px">Back to Home</button>
+  </div>
+  </div>`;
+}
+
+function attachEvents() {
+  const s = document.getElementById('btnSchedule');
+  if (s) s.onclick = () => { screen='schedule'; render(); };
+
+  const sk = document.getElementById('btnSkip');
+  if (sk) sk.onclick = () => { /* stays on home, card dismissed visually */ sk.closest('.welcome-card').style.display='none'; };
+
+  const b = document.getElementById('btnBack');
+  if (b) b.onclick = () => { screen='home'; render(); };
+
+  const c = document.getElementById('btnConfirm');
+  if (c) c.onclick = () => {
+    if (selDays.length > 0 && selTime) { screen='success'; render(); }
+  };
+
+  const h = document.getElementById('btnHome');
+  if (h) h.onclick = () => { selDays=[]; selTime=null; screen='home'; render(); };
+
+  document.querySelectorAll('.day-chip').forEach(el => {
+    el.onclick = () => {
+      const d = el.dataset.day;
+      if (selDays.includes(d)) selDays = selDays.filter(x=>x!==d);
+      else selDays.push(d);
+      render();
+    };
+  });
+
+  document.querySelectorAll('.time-chip').forEach(el => {
+    el.onclick = () => { selTime = el.dataset.time; render(); };
+  });
+}
+
+render();
+</script>
+</body>
+</html>
